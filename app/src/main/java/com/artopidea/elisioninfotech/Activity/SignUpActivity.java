@@ -2,6 +2,7 @@ package com.artopidea.elisioninfotech.Activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -13,7 +14,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,7 +24,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.artopidea.elisioninfotech.ApiService;
+import com.artopidea.elisioninfotech.Api.ApiController;
+import com.artopidea.elisioninfotech.Api.ApiService;
+import com.artopidea.elisioninfotech.Utils.AppPrefrence;
+import com.artopidea.elisioninfotech.Model.LogInModel;
 import com.artopidea.elisioninfotech.Model.RegisterModel;
 import com.artopidea.elisioninfotech.Model.UserModel;
 import com.artopidea.elisioninfotech.R;
@@ -84,6 +87,8 @@ public class SignUpActivity extends AppCompatActivity implements TextWatcher {
     GoogleSignInClient client;
 
     private ApiService apiService;
+    AppPrefrence appPrefrence;
+    Uri selectedImageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +104,7 @@ public class SignUpActivity extends AppCompatActivity implements TextWatcher {
 
         idBinding();
         resend_code_text.setEnabled(false);
+        appPrefrence = new AppPrefrence(SignUpActivity.this);
 
         GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))  // Add your Web client ID from Firebase Console
@@ -269,6 +275,7 @@ public class SignUpActivity extends AppCompatActivity implements TextWatcher {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
+                    appPrefrence.set_user_isLogin("1");
                     progressBar.setVisibility(View.INVISIBLE);
                     Intent intent = new Intent(SignUpActivity.this, DashBoardActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -305,6 +312,7 @@ public class SignUpActivity extends AppCompatActivity implements TextWatcher {
 
                     data.setName(user_name_edit_text.getText().toString());
                     data.setPhone(number_edit_text.getText().toString());
+                    data.setProfile_img(String.valueOf(selectedImageUri));
                     String firebaseUID = FirebaseUtil.currentUserId();
                     data.setFirebase_user_id(firebaseUID);
 
@@ -314,16 +322,12 @@ public class SignUpActivity extends AppCompatActivity implements TextWatcher {
                     myEdit.apply();
 
                     Call<Void> call = apiService.insertData(data);
+
                     call.enqueue(new Callback<Void>() {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
                             if (response.isSuccessful()) {
-
-                                progressBar.setVisibility(View.INVISIBLE);
-                                Intent intent = new Intent(SignUpActivity.this, DashBoardActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
-
+                                loginData("", number_edit_text.getText().toString(), firebaseUID);
                                 // Data inserted successfully
                             } else {
                                 // Handle API error
@@ -335,12 +339,43 @@ public class SignUpActivity extends AppCompatActivity implements TextWatcher {
                             // Handle network failure
                         }
                     });
+
                 } else {
                     progressBar.setVisibility(View.INVISIBLE);
                     sign_up_text.setEnabled(true);
                     sign_up_text.setBackgroundResource(R.drawable.bg_2);
                     AndroidUtil.showToast(getApplicationContext(), "OTP verification failed");
                 }
+            }
+        });
+    }
+
+    private void loginData(String user_email, String user_phone, String user_firebase_user_id) {
+
+        Call<LogInModel> call = ApiController.getInstance()
+                .getapi()
+                .getregister(user_email, user_phone, user_firebase_user_id);
+
+        call.enqueue(new Callback<LogInModel>() {
+            @Override
+            public void onResponse(Call<LogInModel> call, Response<LogInModel> response) {
+                LogInModel obj = response.body();
+
+                if (obj.getStatus().equals("1")) {
+                    appPrefrence.set_token(obj.getLogInData().getToken());
+                    appPrefrence.set_user_name(user_name_edit_text.getText().toString());
+                    progressBar.setVisibility(View.INVISIBLE);
+
+                    appPrefrence.set_user_isLogin("1");
+                    Intent intent = new Intent(SignUpActivity.this, DashBoardActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LogInModel> call, Throwable t) {
+                Log.e("Akash", "onResponse: ");
             }
         });
     }
@@ -391,6 +426,8 @@ public class SignUpActivity extends AppCompatActivity implements TextWatcher {
                                     String userEmail = firebaseUser.getEmail();
                                     String firebaseUID = mAuth.getUid();
 
+                                    appPrefrence.set_user_email(userEmail);
+
                                     Retrofit retrofit = new Retrofit.Builder()
                                             .baseUrl("https://artopidea.com/api/")
                                             .addConverterFactory(GsonConverterFactory.create())
@@ -420,10 +457,7 @@ public class SignUpActivity extends AppCompatActivity implements TextWatcher {
                                         public void onResponse(Call<Void> call, Response<Void> response) {
                                             if (response.isSuccessful()) {
                                                 // Data inserted successfully
-                                                progressBar.setVisibility(View.INVISIBLE);
-                                                Intent intent = new Intent(SignUpActivity.this, DashBoardActivity.class);
-                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                                startActivity(intent);
+                                                loginData(userEmail, "", firebaseUID);
 
                                             } else {
                                                 // Handle API error
@@ -447,7 +481,10 @@ public class SignUpActivity extends AppCompatActivity implements TextWatcher {
         }
 
         if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            Uri selectedImageUri = data.getData();
+            selectedImageUri = data.getData();
+
+            String imagePath = getRealPathFromURI(selectedImageUri);
+            appPrefrence.set_user_profile(imagePath);
 
             try {
                 Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImageUri));
@@ -458,6 +495,16 @@ public class SignUpActivity extends AppCompatActivity implements TextWatcher {
             }
         }
 
+    }
+
+    public String getRealPathFromURI(Uri contentUri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(contentUri, projection, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String filePath = cursor.getString(column_index);
+        cursor.close();
+        return filePath;
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {

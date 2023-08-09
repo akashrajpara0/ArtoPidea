@@ -1,16 +1,18 @@
-package com.artopidea.elisioninfotech;
+package com.artopidea.elisioninfotech.Model;
 
-public class responsemodel {
+public class LogInModel {
 
     String message;
     String status;
+    LogInData data = null;
 
-    public responsemodel() {
+    public LogInModel() {
     }
 
-    public responsemodel(String message, String status) {
+    public LogInModel(String message, String status, LogInData data) {
         this.message = message;
         this.status = status;
+        this.data = data;
     }
 
     public String getMessage() {
@@ -27,5 +29,13 @@ public class responsemodel {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public LogInData getLogInData() {
+        return data;
+    }
+
+    public void setLogInData(LogInData data) {
+        this.data = data;
     }
 }

@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -16,9 +17,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.artopidea.elisioninfotech.ApiController;
+import com.artopidea.elisioninfotech.Api.ApiController;
+import com.artopidea.elisioninfotech.Utils.AppPrefrence;
 import com.artopidea.elisioninfotech.R;
-import com.artopidea.elisioninfotech.responsemodel;
+import com.artopidea.elisioninfotech.Model.LogInModel;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,18 +38,17 @@ public class SignInActivity extends AppCompatActivity {
     String userEmail = "";
     String userPhone = "";
     String userFirebaseUserId = "";
+    AppPrefrence appPrefrence;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+        appPrefrence = new AppPrefrence(SignInActivity.this);
+
         SharedPreferences sharedPreferences = getSharedPreferences("fireBaseUID", MODE_PRIVATE);
         userFirebaseUserId = sharedPreferences.getString("fUID", "");
-
-        SharedPreferences sharedPreferences1 = getSharedPreferences("USER_EMAIL", MODE_PRIVATE);
-        userEmail = sharedPreferences1.getString("userEmail", "");
-
 
         findViewById(R.id.back_image).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,7 +99,7 @@ public class SignInActivity extends AppCompatActivity {
                 sign_in_text.setEnabled(false);
                 sign_in_text.setBackgroundResource(R.drawable.bg_3);
                 sign_in_text.setEnabled(false);
-                loginData(userEmail, userPhone, userFirebaseUserId);
+                loginData(appPrefrence.get_user_email(), userPhone, userFirebaseUserId);
             }
         });
 
@@ -129,16 +130,18 @@ public class SignInActivity extends AppCompatActivity {
 
     private void loginData(String user_email, String user_phone, String user_firebase_user_id) {
 
-        Call<responsemodel> call = ApiController.getInstance()
+        Call<LogInModel> call = ApiController.getInstance()
                 .getapi()
                 .getregister(user_email, user_phone, user_firebase_user_id);
 
-        call.enqueue(new Callback<responsemodel>() {
+        call.enqueue(new Callback<LogInModel>() {
             @Override
-            public void onResponse(Call<responsemodel> call, Response<responsemodel> response) {
-                responsemodel obj = response.body();
+            public void onResponse(Call<LogInModel> call, Response<LogInModel> response) {
+                LogInModel obj = response.body();
 
                 if (obj.getStatus().equals("1")) {
+                    appPrefrence.set_token(obj.getLogInData().getToken());
+                    appPrefrence.set_user_isLogin("1");
                     Intent intent = new Intent(SignInActivity.this, DashBoardActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
@@ -152,8 +155,8 @@ public class SignInActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<responsemodel> call, Throwable t) {
-
+            public void onFailure(Call<LogInModel> call, Throwable t) {
+                Log.e("Akash", "onResponse: ");
             }
         });
     }

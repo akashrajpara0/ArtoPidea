@@ -22,7 +22,6 @@ import com.artopidea.elisioninfotech.R;
 
 public class Fragment2 extends Fragment {
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

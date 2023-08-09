@@ -17,7 +17,13 @@ import com.artopidea.elisioninfotech.Activity.SettingGeneralActivity;
 import com.artopidea.elisioninfotech.Activity.SignInActivity;
 import com.artopidea.elisioninfotech.Activity.SplashActivity;
 import com.artopidea.elisioninfotech.R;
+import com.artopidea.elisioninfotech.Utils.AppPrefrence;
 import com.artopidea.elisioninfotech.Utils.FirebaseUtil;
+import com.bumptech.glide.Glide;
+
+import java.io.File;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class Fragment3 extends Fragment {
 
@@ -26,9 +32,11 @@ public class Fragment3 extends Fragment {
     LinearLayout setting_3_img_logout_account;
     LinearLayout setting_4_img_delete_account;
 
+    CircleImageView profile_image;
     ImageView sign_in_image;
     ImageView banner_buy_pro;
     TextView user_name_text;
+    AppPrefrence appPrefrence;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,7 +44,9 @@ public class Fragment3 extends Fragment {
         View view = inflater.inflate(R.layout.fragment_3, container, false);
         idBinding(view);
 
-        /*if (FirebaseUtil.isLoggedIn()) {
+        appPrefrence = new AppPrefrence(getActivity());
+
+        if (appPrefrence.get_user_isLogin().equals("1")) {
             sign_in_image.setVisibility(View.INVISIBLE);
             setting_3_img_logout_account.setVisibility(View.VISIBLE);
             setting_4_img_delete_account.setVisibility(View.VISIBLE);
@@ -45,7 +55,11 @@ public class Fragment3 extends Fragment {
             setting_3_img_logout_account.setVisibility(View.GONE);
             setting_4_img_delete_account.setVisibility(View.GONE);
         }
-        user_name_text.setText(FirebaseUtil.userName);*/
+        user_name_text.setText(appPrefrence.get_user_name());
+
+        Glide.with(this)
+                .load(new File(appPrefrence.get_user_profile()))
+                .into(profile_image);
 
         sign_in_image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,5 +114,6 @@ public class Fragment3 extends Fragment {
         sign_in_image = (ImageView) view.findViewById(R.id.sign_in_image);
         banner_buy_pro = (ImageView) view.findViewById(R.id.banner_buy_pro);
         user_name_text = (TextView) view.findViewById(R.id.user_name_text);
+        profile_image = (CircleImageView) view.findViewById(R.id.profile_image);
     }
 }
