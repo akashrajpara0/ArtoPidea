@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "621408201170",
+    "project_id": "demoproject-5afa8",
+    "storage_bucket": "demoproject-5afa8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:621408201170:android:1b100ef84807917f65400b",
+        "android_client_info": {
+          "package_name": "com.artopidea.elisioninfotech"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "621408201170-0k94llajdklv6hsunjp72m6kjgu9sa4h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWiqNxgtYvAljn8B7PT4L2TiTGOG-qSCE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "621408201170-0k94llajdklv6hsunjp72m6kjgu9sa4h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,72 @@
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+}
+
+android {
+    namespace 'com.artopidea.elisioninfotech'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.artopidea.elisioninfotech"
+        minSdk 21
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    // Glide
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
+
+    // FB Sgimmer
+    implementation 'com.facebook.shimmer:shimmer:0.5.0@aar'
+
+    // Circleimageview
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    // FireBase
+    implementation platform('com.google.firebase:firebase-bom:32.2.0')
+    implementation "com.google.firebase:firebase-auth"
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-firestore'
+
+    implementation 'com.google.android.gms:play-services-auth:20.6.0'
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    implementation 'com.amitshekhar.android:android-networking:1.0.2'
+
+//    implementation 'com.squareup.picasso:picasso:2.71828'
+//    implementation 'com.github.bumptech.glide:glide:4.13.2'
+//    implementation 'com.alphamovie.library:alpha-movie:1.2.1'
+
+    // meow
+//    implementation  'com.etebarian:meow-bottom-navigation-java:1.2.0'
+//    implementation 'np.com.susanthapa:curved_bottom_navigation:0.6.5'
+
+}
