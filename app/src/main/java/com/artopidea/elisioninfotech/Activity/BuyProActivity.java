@@ -12,8 +12,10 @@ import com.artopidea.elisioninfotech.R;
 public class BuyProActivity extends AppCompatActivity {
 
     LinearLayout layout_year;
+    LinearLayout layout_month;
     LinearLayout layout_week;
     ImageView image_year;
+    ImageView image_month;
     ImageView image_week;
 
     @Override
@@ -39,6 +41,15 @@ public class BuyProActivity extends AppCompatActivity {
             }
         });
 
+        layout_month.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                unSelected();
+                layout_month.setBackgroundResource(R.drawable.bg_1);
+                image_month.setImageResource(R.drawable.buy_now_selected);
+            }
+        });
+
         layout_week.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,15 +62,19 @@ public class BuyProActivity extends AppCompatActivity {
 
     public void unSelected() {
         image_year.setImageResource(R.drawable.buy_now_unselected);
+        image_month.setImageResource(R.drawable.buy_now_unselected);
         image_week.setImageResource(R.drawable.buy_now_unselected);
         layout_year.setBackgroundResource(R.drawable.background_3);
+        layout_month.setBackgroundResource(R.drawable.background_3);
         layout_week.setBackgroundResource(R.drawable.background_3);
     }
 
     private void idBinding() {
         layout_year = (LinearLayout) findViewById(R.id.layout_year);
+        layout_month = (LinearLayout) findViewById(R.id.layout_month);
         layout_week = (LinearLayout) findViewById(R.id.layout_week);
         image_year = (ImageView) findViewById(R.id.image_year);
+        image_month = (ImageView) findViewById(R.id.image_month);
         image_week = (ImageView) findViewById(R.id.image_week);
     }
 
